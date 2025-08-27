@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Registrar - Shibarium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://woofingjace.com/images/jace.png" type="image/x-icon">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #121212; color: #E6E6E6; padding: 20px; min-height: 100vh; line-height: 1.5; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 30px; background: #1A1A1A; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
+    h1 { text-align: center; color: #cccccc; font-size: clamp(1.8em, 5vw, 2.5em); margin-bottom: 25px; font-weight: 700; text-transform: uppercase; }
+    .section { background: #222222; padding: 20px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #cccccc; }
+    h2 { color: #cccccc; font-size: clamp(1.2em, 3.5vw, 1.6em); margin-bottom: 15px; font-weight: 600; }
+    .toggle-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+    .toggle-button { background: #333333; color: #ffffff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 1em; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; margin: 5px; }
+    .toggle-button.active { background: #555555; transform: translateY(-2px); }
+    .toggle-button:hover { background: #555555; transform: translateY(-2px); }
+    .button { background: #333333; color: #ffffff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 1em; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; margin: 5px; }
+    .button:hover { background: #555555; transform: translateY(-2px); }
+    .button:disabled { background: #444444; color: #777777; cursor: not-allowed; }
+    input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #cccccc; border-radius: 6px; background: #2A2A2A; color: #E6E6E6; font-size: 1em; }
+    input::placeholder, textarea::placeholder { color: #666666; }
+    textarea { min-height: 100px; resize: vertical; }
+    .status { margin-top: 10px; font-size: 0.9em; color: #cccccc; }
+    .wallet-info { color: #cccccc; font-weight: 600; word-break: break-all; }
+    .output-box { background: #2A2A2A; padding: 15px; border-radius: 6px; margin-bottom: 15px; word-break: break-all; font-size: 0.9em; color: #E6E6E6; }
+    .output-box label { display: block; font-size: 0.9em; margin-bottom: 5px; color: #cccccc; }
+    .footer { text-align: center; margin-top: 30px; font-size: 0.85em; color: #666666; }
+    .footer a { color: #cccccc; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .how-it-works { background: #222222; padding: 20px; border-radius: 8px; border: 1px solid #cccccc; margin-top: 20px; }
+    .how-it-works ul { list-style-type: disc; padding-left: 20px; margin-top: 10px; }
+    .how-it-works li { margin-bottom: 12px; font-size: 0.9em; }
+    .how-it-works .highlight { color: #cccccc; font-weight: 600; }
+    @media (max-width: 768px) {
+      .container { padding: 15px; }
+      .section, .how-it-works { padding: 15px; }
+      .button, .toggle-button { width: 100%; padding: 12px; margin: 8px 0; }
+      .how-it-works ul { padding-left: 15px; }
+      .how-it-works li { font-size: 0.85em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Domain Launchpad</h1>
+    <div class="section">
+      <h2>Connect Wallet</h2>
+      <input type="text" id="privateKey" placeholder="Enter private key (starts with 0x)">
+      <p>Wallet Address: <span id="walletAddress" class="wallet-info">Not connected</span></p>
+      <div id="networkStatus" class="status">Enter private key to connect...</div>
+    </div>
+    <div class="section" id="mintDomainSection">
+      <h2>Auto-Mint Domains</h2>
+      <div class="toggle-buttons">
+        <button class="toggle-button active" id="boneButton">.bone</button>
+      </div>
+      <div class="toggle-buttons">
+        <button class="toggle-button active" id="digit1Button" onclick="selectDigit(1)">1 Digit</button>
+        <button class="toggle-button" id="digit2Button" onclick="selectDigit(2)">2 Digits</button>
+        <button class="toggle-button" id="digit3Button" onclick="selectDigit(3)">3 Digits</button>
+        <button class="toggle-button" id="digit4Button" onclick="selectDigit(4)">4 Digits</button>
+        <button class="toggle-button" id="digit5Button" onclick="selectDigit(5)">5 Digits</button>
+        <button class="toggle-button" id="digit6Button" onclick="selectDigit(6)">6 Digits</button>
+      </div>
+      <div class="toggle-buttons">
+        <button class="toggle-button active" id="typeLettersButton" onclick="selectType('letters')">Letters</button>
+        <button class="toggle-button" id="typeNumbersButton" onclick="selectType('numbers')">Numbers</button>
+      </div>
+      <textarea id="letterDomains" placeholder="Enter letter domains, one per line (e.g., \nname1\nname2\nname3)" style="display: none;"></textarea>
+      <input type="number" id="startNumber" placeholder="Enter starting number (e.g., 1)" style="display: none;">
+      <textarea id="transferAddresses" placeholder="Enter target transfer addresses, one per line (e.g., \n0x123...\n0x456...)"></textarea>
+      <button id="startAutoMint" class="button" disabled>Start Auto-Minting</button>
+      <button id="stopAutoMint" class="button" disabled>Stop Auto-Minting</button>
+      <div class="output-box">
+        <label>Contract Address</label>
+        <span id="contractAddress">0x7e606302Be5AFeAeF82955e948397430A8db80dd</span>
+      </div>
+      <button id="copyAddressButton" class="button">Copy Contract Address</button>
+      <div id="mintStatus" class="status"></div>
+    </div>
+    <div class="how-it-works">
+      <h2>How It Works?</h2>
+      <p>Use our launchpad to mint unique .bone domain NFTs on Shibarium and transfer them!</p>
+      <ul>
+        <li><strong>Connect Wallet</strong>: Enter a private key starting with 0x to connect to Shibarium (Chain ID: 109). Ensure you have enough <span class="highlight">BONE</span> to cover gas fees.</li>
+        <li><strong>Auto-Minting</strong>: Select .bone, choose a domain length (1-6 digits) and type (letters or numbers). For letters, enter domains one per line, and they will be minted in order; for numbers, enter a starting number to mint sequentially. Enter target transfer addresses (one per line), click "Start Auto-Minting," and the system will check for existing NFTs at the current address, transfer them to the target addresses in order, then mint new domains and cycle through the target addresses until manually stopped.</li>
+        <li><strong>Manual Registration</strong>: Copy the contract address for manual registration, send 0 BONE via your wallet with hex data as msg.data.</li>
+        <li><strong>Security & Uniqueness</strong>: Each address can mint only one domain per contract, domain IDs are case-insensitive, and Shibarium transaction fees are low.</li>
+      </ul>
+    </div>
+    <div class="footer">
+      Powered by <a href="https://shibariumscan.io/" target="_blank">Shibarium</a> | Domain Launchpad © 2025
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+  <script>
+    let web3, account, domainContract;
+    let selectedDomain = 'bone';
+    let selectedDigit = 1;
+    let selectedType = 'letters';
+    let isAutoMinting = false;
+
+    const contracts = {
+      bone: { address: '0x7e606302Be5AFeAeF82955e948397430A8db80dd', suffix: 'bone', protocol: 'bonename', currency: 'BONE', name: 'Bone Inscription Domain Name', symbol: 'DBONE' }
+    };
+
+    const domainContractABI = [
+      {"inputs":[{"internalType":"string","name":"_id","type":"string"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"minter","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"string","name":"id","type":"string"}],"name":"Minted","type":"event"},
+      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"string","name":"","type":"string"}],"name":"idsMintedLower","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+    ];
+
+    const shibarium = { chainId: 109, name: 'Shibarium Mainnet', explorerUrl: 'https://shibariumscan.io', rpcUrl: 'https://rpc.shibrpc.com' };
+
+    async function connectWallet() {
+      const privateKey = document.getElementById('privateKey').value.trim();
+      const status = document.getElementById('networkStatus');
+      try {
+        if (!privateKey.startsWith('0x') || privateKey.length !== 66) {
+          status.innerText = "Please enter a valid 64-character private key starting with 0x";
+          return;
+        }
+        status.innerText = "Connecting...";
+        web3 = new Web3(shibarium.rpcUrl);
+        account = web3.eth.accounts.privateKeyToAccount(privateKey);
+        web3.eth.accounts.wallet.add(account);
+        web3.eth.defaultAccount = account.address;
+        document.getElementById('walletAddress').innerText = `${account.address.slice(0, 6)}...${account.address.slice(-4)}`;
+        domainContract = new web3.eth.Contract(domainContractABI, contracts[selectedDomain].address);
+        status.innerText = "Connected to Shibarium";
+        document.getElementById('startAutoMint').disabled = false;
+      } catch (error) {
+        console.error(error);
+        status.innerText = "Connection failed: " + error.message;
+      }
+    }
+
+    function selectDigit(digit) {
+      selectedDigit = digit;
+      document.getElementById('digit1Button').classList.toggle('active', digit === 1);
+      document.getElementById('digit2Button').classList.toggle('active', digit === 2);
+      document.getElementById('digit3Button').classList.toggle('active', digit === 3);
+      document.getElementById('digit4Button').classList.toggle('active', digit === 4);
+      document.getElementById('digit5Button').classList.toggle('active', digit === 5);
+      document.getElementById('digit6Button').classList.toggle('active', digit === 6);
+      document.getElementById('mintStatus').textContent = '';
+    }
+
+    function selectType(type) {
+      selectedType = type;
+      document.getElementById('typeLettersButton').classList.toggle('active', type === 'letters');
+      document.getElementById('typeNumbersButton').classList.toggle('active', type === 'numbers');
+      document.getElementById('letterDomains').style.display = type === 'letters' ? 'block' : 'none';
+      document.getElementById('startNumber').style.display = type === 'numbers' ? 'block' : 'none';
+      document.getElementById('mintStatus').textContent = '';
+    }
+
+    function isValidLetterDomain(domain) {
+      const regex = /^[a-zA-Z]{1,15}$/;
+      return regex.test(domain);
+    }
+
+    function isValidNumberDomain(domain) {
+      const regex = /^[0-9]{1,15}$/;
+      return regex.test(domain);
+    }
+
+    function isValidAddress(address) {
+      return address.startsWith('0x') && address.length === 42;
+    }
+
+    async function checkDomainAvailability(domainId) {
+      try {
+        const domainIdLower = domainId.toLowerCase();
+        const isMinted = await domainContract.methods.idsMintedLower(domainIdLower).call();
+        return !isMinted;
+      } catch (error) {
+        console.error(`Failed to check availability of domain ${domainId}:`, error);
+        return false;
+      }
+    }
+
+    async function checkAndTransferExistingNFT(toAddress) {
+      const status = document.getElementById('mintStatus');
+      try {
+        const balance = await domainContract.methods.balanceOf(account.address).call();
+        if (balance > 0) {
+          status.innerText = `Detected NFT in current address, transferring to ${toAddress}...`;
+          const tokenId = await domainContract.methods.tokenOfOwnerByIndex(account.address, 0).call();
+          const gas = await domainContract.methods.transferFrom(account.address, toAddress, tokenId).estimateGas({ from: account.address }).catch(() => 100000);
+          await domainContract.methods.transferFrom(account.address, toAddress, tokenId).send({ from: account.address, gas: Math.floor(gas * 1.2), gasPrice: web3.utils.toWei('0.0001', 'gwei') });
+          status.innerText = `NFT ${tokenId} transferred to ${toAddress}`;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error(`Failed to transfer existing NFT:`, error);
+        status.innerText = `Failed to transfer existing NFT: ${error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message}`;
+        return false;
+      }
+    }
+
+    async function mintDomain(domainId) {
+      const section = document.getElementById('mintDomainSection');
+      const status = document.getElementById('mintStatus');
+      try {
+        section.classList.add('loading');
+        status.innerText = `Minting domain ${domainId}.${contracts[selectedDomain].suffix}...`;
+        const gas = await domainContract.methods.mint(domainId).estimateGas({ from: account.address }).catch(() => 600000);
+        const tx = await domainContract.methods.mint(domainId).send({ from: account.address, gas: Math.floor(gas * 1.2), gasPrice: web3.utils.toWei('0.0001', 'gwei') });
+        status.innerHTML = `Domain ${domainId}.${contracts[selectedDomain].suffix} minted successfully! Token ID: ${tx.events.Minted.returnValues.tokenId} (<a href="${shibarium.explorerUrl}/token/${contracts[selectedDomain].address}?a=${tx.events.Minted.returnValues.tokenId}" target="_blank">View</a>)`;
+        return tx.events.Minted.returnValues.tokenId;
+      } catch (error) {
+        console.error(`Failed to mint domain ${domainId}:`, error);
+        status.innerText = `Failed to mint domain ${domainId}: ${error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message}`;
+        return null;
+      } finally {
+        section.classList.remove('loading');
+      }
+    }
+
+    async function transferNFT(tokenId, toAddress) {
+      const section = document.getElementById('mintDomainSection');
+      const status = document.getElementById('mintStatus');
+      try {
+        section.classList.add('loading');
+        status.innerText = `Transferring NFT ${tokenId} to ${toAddress}...`;
+        const gas = await domainContract.methods.transferFrom(account.address, toAddress, tokenId).estimateGas({ from: account.address }).catch(() => 100000);
+        await domainContract.methods.transferFrom(account.address, toAddress, tokenId).send({ from: account.address, gas: Math.floor(gas * 1.2), gasPrice: web3.utils.toWei('0.0001', 'gwei') });
+        status.innerText = `NFT ${tokenId} successfully transferred to ${toAddress}`;
+      } catch (error) {
+        console.error(`Failed to transfer NFT ${tokenId}:`, error);
+        status.innerText = `Failed to transfer NFT ${tokenId}: ${error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message}`;
+      } finally {
+        section.classList.remove('loading');
+      }
+    }
+
+    async function startAutoMint() {
+      const transferAddresses = document.getElementById('transferAddresses').value.trim();
+      const status = document.getElementById('mintStatus');
+      const letterDomains = document.getElementById('letterDomains').value.trim();
+      const startNumber = document.getElementById('startNumber').value.trim();
+
+      if (!web3 || !account) {
+        status.innerText = "Please connect your wallet first!";
+        return;
+      }
+      const addressList = transferAddresses.split('\n').map(addr => addr.trim()).filter(addr => addr && isValidAddress(addr));
+      if (addressList.length === 0) {
+        status.innerText = "Please enter at least one valid target transfer address (starts with 0x, 42 characters)!";
+        return;
+      }
+      if (selectedType === 'letters' && !letterDomains) {
+        status.innerText = "Please enter at least one letter domain!";
+        return;
+      }
+      if (selectedType === 'numbers' && (!startNumber || isNaN(startNumber) || startNumber < 0)) {
+        status.innerText = "Please enter a valid starting number (greater than or equal to 0)!";
+        return;
+      }
+
+      isAutoMinting = true;
+      document.getElementById('startAutoMint').disabled = true;
+      document.getElementById('stopAutoMint').disabled = false;
+      status.innerText = "Starting auto-minting...";
+
+      const maxAttempts = 1000; // Maximum attempts
+      let attempts = 0;
+      let domainList = [];
+      let currentNumber = parseInt(startNumber) || 0;
+      let addressIndex = 0; // Current target address index
+
+      if (selectedType === 'letters') {
+        domainList = letterDomains.split('\n').map(d => d.trim()).filter(d => d && isValidLetterDomain(d));
+        if (domainList.length === 0) {
+          status.innerText = "No valid letter domains entered!";
+          stopAutoMint();
+          return;
+        }
+      }
+
+      while (isAutoMinting && attempts < maxAttempts) {
+        const currentAddress = addressList[addressIndex];
+        // Step 1: Check and transfer existing NFT
+        const transferred = await checkAndTransferExistingNFT(currentAddress);
+        if (transferred) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          addressIndex = (addressIndex + 1) % addressList.length; // Cycle to next address
+          continue;
+        }
+
+        // Step 2: Get next domain
+        let domainId;
+        if (selectedType === 'letters') {
+          if (domainList.length === 0) {
+            status.innerText = "Letter domain list exhausted, auto-minting stopped";
+            stopAutoMint();
+            return;
+          }
+          domainId = domainList[0]; // Take first domain
+        } else {
+          domainId = currentNumber.toString().padStart(selectedDigit, '0');
+          if (domainId.length > selectedDigit || domainId.length > 15 || !isValidNumberDomain(domainId)) {
+            currentNumber++;
+            attempts++;
+            continue; // Skip invalid number
+          }
+        }
+
+        status.innerText = `Checking domain ${domainId}.${contracts[selectedDomain].suffix}...`;
+        const isAvailable = await checkDomainAvailability(domainId);
+        if (isAvailable) {
+          const tokenId = await mintDomain(domainId);
+          if (tokenId) {
+            await transferNFT(tokenId, currentAddress);
+            addressIndex = (addressIndex + 1) % addressList.length; // Cycle to next address
+          }
+          if (selectedType === 'letters') {
+            domainList.shift(); // Remove tried domain
+          } else {
+            currentNumber++; // Increment number
+          }
+        } else {
+          status.innerText = `Domain ${domainId}.${contracts[selectedDomain].suffix} already minted, trying next...`;
+          if (selectedType === 'letters') {
+            domainList.shift(); // Remove unavailable domain
+          } else {
+            currentNumber++; // Increment number
+          }
+        }
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (attempts >= maxAttempts) {
+        status.innerText = "Maximum attempts reached, auto-minting stopped";
+        stopAutoMint();
+      }
+    }
+
+    function stopAutoMint() {
+      isAutoMinting = false;
+      document.getElementById('startAutoMint').disabled = false;
+      document.getElementById('stopAutoMint').disabled = true;
+      document.getElementById('mintStatus').innerText = "Auto-minting stopped";
+    }
+
+    function copyToClipboard() {
+      const status = document.getElementById('mintStatus');
+      const contractAddress = document.getElementById('contractAddress').textContent;
+      const textArea = document.createElement('textarea');
+      textArea.value = contractAddress;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        status.innerText = "Contract address copied to clipboard";
+      } catch (error) {
+        console.error("Copy failed:", error);
+        status.innerText = "Failed to copy contract address, please copy manually";
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('startAutoMint').disabled = true;
+      document.getElementById('stopAutoMint').disabled = true;
+      document.getElementById('copyAddressButton').disabled = false;
+      document.getElementById('privateKey').addEventListener('input', connectWallet);
+      document.getElementById('startAutoMint').addEventListener('click', startAutoMint);
+      document.getElementById('stopAutoMint').addEventListener('click', stopAutoMint);
+      document.getElementById('copyAddressButton').addEventListener('click', copyToClipboard);
+    });
+  </script>
+</body>
+</html>
