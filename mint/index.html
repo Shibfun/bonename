@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Launchpad</title>
+    <link rel="icon" type="image/png" href="https://woofingjace.com/images/jace.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('https://woofingjace.com/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(5px);
+            z-index: -1;
+        }
+        .header, .container, footer, .modal { position: relative; z-index: 1; }
+        .header { padding: 15px 0; text-align: center; width: 100%; }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 40px;
+        }
+        .header-top .actions { display: flex; gap: 12px; }
+        .action-btn {
+            background: #34495E;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .action-btn:hover { background: #F4A261; }
+        .header-content h1 {
+            font-size: 1.8em;
+            color: #F4A261;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .wallet-info {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #A8B5D4;
+            margin-bottom: 10px;
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 0 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .section {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid #F4A261;
+        }
+        .section-title {
+            font-size: 1.3em;
+            color: #F4A261;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        input {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: #34495E;
+            color: #fff;
+            font-size: 1em;
+            text-align: center;
+            transition: box-shadow 0.3s, background 0.3s;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px #F4A261;
+            background: #3A536B;
+        }
+        button {
+            background: #F4A261;
+            color: #fff;
+            border: none;
+            padding: 12px 0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px auto;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background: #E07A5F;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        button.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .info-panel {
+            background: #34495E;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #2C3E50;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #fff;
+            max-width: 320px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .modal-content p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .modal-content button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.95em;
+        }
+        footer {
+            background: rgba(30, 42, 68, 0.8);
+            text-align: center;
+            padding: 15px;
+            width: 100%;
+            color: #A8B5D4;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+        @media (max-width: 480px) {
+            .header-content h1 { font-size: 1.5em; }
+            .wallet-info { font-size: 1em; }
+            .section { padding: 15px; }
+            .container { max-width: 100%; padding: 0 10px; }
+            button { padding: 10px 0; font-size: 0.9em; max-width: 180px; }
+            input { font-size: 0.9em; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <span></span>
+            <div class="actions">
+                <button class="action-btn" onclick="window.open('https://x.com/shibariumnet', '_blank')"><i class="fab fa-twitter"></i></button>
+                <button class="action-btn" onclick="window.open('https://t.me/shibariumnetwork', '_blank')"><i class="fab fa-telegram-plane"></i></button>
+            </div>
+        </div>
+        <div class="header-content">
+            <h1>Domain Launchpad</h1>
+            <div class="wallet-info" id="walletAddress">Not connected</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <div class="section-title">Connect Wallet</div>
+            <button id="connectButton">Connect MetaMask</button>
+        </div>
+        <div class="section" id="mintDomainSection">
+            <div class="section-title">Mint .bone Domain</div>
+            <div class="input-group">
+                <input type="text" id="domainInput" placeholder="Enter domain (e.g., myname)">
+            </div>
+            <button id="mintButton" disabled>Mint Domain</button>
+            <div class="info-panel" id="mintStatus">Enter a domain name and connect wallet to mint.</div>
+            <div class="info-panel">
+                Contract Address: <span id="contractAddress">0x7e606302Be5AFeAeF82955e948397430A8db80dd</span>
+                <br>
+                <button id="copyAddressButton" class="button">Copy Contract Address</button>
+            </div>
+        </div>
+    </div>
+    <footer>Powered by <a href="https://shibariumscan.io/" target="_blank">Shibarium</a> | Domain Launchpad © 2025</footer>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage"></p>
+            <button onclick="closeModal()">OK</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        let web3, accounts, domainContract;
+        const CONTRACT_ADDRESS = "0x7e606302Be5AFeAeF82955e948397430A8db80dd";
+        const DOMAIN_ABI = [
+            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"minter","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"string","name":"id","type":"string"}],"name":"Minted","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},
+            {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"_id","type":"string"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"mintBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"_approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"stateMutability":"payable","type":"fallback"},
+            {"inputs":[{"internalType":"string","name":"","type":"string"}],"name":"idsMintedLower","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"idByTokenId","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"ownerToTokenId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenName","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"tokenLengthCategory","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"tokenCharType","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"SUFFIX","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"stateMutability":"payable","type":"receive"}
+        ];
+        const shibariumMainnet = {
+            chainId: 109,
+            chainName: 'Shibarium',
+            nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
+            rpcUrls: ['https://www.shibrpc.com'],
+            blockExplorerUrls: ['https://shibariumscan.io']
+        };
+
+        function showModal(message) {
+            document.getElementById('modalMessage').innerHTML = message;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        async function updateWalletInfo() {
+            if (!accounts) {
+                document.getElementById('walletAddress').innerText = 'Not connected';
+                document.getElementById('mintButton').disabled = true;
+            } else {
+                const shortAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+                document.getElementById('walletAddress').innerText = shortAddress;
+                document.getElementById('mintButton').disabled = false;
+            }
+        }
+
+        async function connectWallet() {
+            const connectButton = document.getElementById('connectButton');
+            try {
+                if (!window.ethereum) {
+                    showModal('No wallet detected. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.');
+                    return;
+                }
+                connectButton.classList.add('loading');
+                web3 = new Web3(window.ethereum);
+                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (!accounts.length) {
+                    showModal('Please unlock your wallet or connect it.');
+                    return;
+                }
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== 109) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: web3.utils.numberToHex(109) }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [shibariumMainnet]
+                            });
+                        } else {
+                            showModal('Failed to switch network. Please add Shibarium manually.');
+                            return;
+                        }
+                    }
+                }
+                domainContract = new web3.eth.Contract(DOMAIN_ABI, CONTRACT_ADDRESS);
+                showModal('Connected to Shibarium successfully! 🎉');
+                updateWalletInfo();
+            } catch (error) {
+                showModal(`Connection failed: ${error.message}`);
+            } finally {
+                connectButton.classList.remove('loading');
+            }
+        }
+
+        async function mintDomain() {
+            if (!web3 || !domainContract || !accounts) {
+                showModal('Please connect your wallet first! 🔧');
+                return;
+            }
+            const domainInput = document.getElementById('domainInput').value.trim();
+            const mintButton = document.getElementById('mintButton');
+            const mintStatus = document.getElementById('mintStatus');
+            if (!domainInput) {
+                showModal('Please enter a domain name!');
+                return;
+            }
+            const isValid = /^[a-zA-Z0-9]{1,15}$/.test(domainInput);
+            if (!isValid) {
+                showModal('Domain must be 1-15 characters, letters or numbers only!');
+                return;
+            }
+            try {
+                mintButton.classList.add('loading');
+                mintStatus.innerText = `Checking domain ${domainInput}.bone availability...`;
+                const lowerId = domainInput.toLowerCase();
+                const isMinted = await domainContract.methods.idsMintedLower(lowerId).call();
+                if (isMinted) {
+                    showModal(`Domain ${domainInput}.bone is already minted!`);
+                    return;
+                }
+                const hasMinted = await domainContract.methods.ownerToTokenId(accounts[0]).call();
+                if (hasMinted != 0) {
+                    showModal('This address has already minted a domain!');
+                    return;
+                }
+                mintStatus.innerText = `Minting ${domainInput}.bone...`;
+                const gas = await domainContract.methods.mint(domainInput).estimateGas({ from: accounts[0] }).catch(() => 600000);
+                const tx = await domainContract.methods.mint(domainInput).send({ 
+                    from: accounts[0], 
+                    gas: Math.floor(gas * 1.2), 
+                    gasPrice: web3.utils.toWei('0.0001', 'gwei') 
+                });
+                mintStatus.innerHTML = `Domain ${domainInput}.bone minted! Token ID: ${tx.events.Minted.returnValues.tokenId} (<a href="https://shibariumscan.io/token/${CONTRACT_ADDRESS}?a=${tx.events.Minted.returnValues.tokenId}" target="_blank">View</a>)`;
+                showModal(`Successfully minted ${domainInput}.bone! 🎉`);
+                document.getElementById('domainInput').value = '';
+            } catch (error) {
+                showModal(`Minting failed: ${error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message}`);
+                mintStatus.innerText = `Failed to mint ${domainInput}.bone`;
+            } finally {
+                mintButton.classList.remove('loading');
+            }
+        }
+
+        function copyToClipboard() {
+            const contractAddress = document.getElementById('contractAddress').textContent;
+            const mintStatus = document.getElementById('mintStatus');
+            const textArea = document.createElement('textarea');
+            textArea.value = contractAddress;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                mintStatus.innerText = 'Contract address copied to clipboard';
+            } catch (error) {
+                mintStatus.innerText = 'Failed to copy contract address';
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        document.getElementById('connectButton').addEventListener('click', connectWallet);
+        document.getElementById('mintButton').addEventListener('click', mintDomain);
+        document.getElementById('copyAddressButton').addEventListener('click', copyToClipboard);
+
+        window.ethereum?.on('chainChanged', (chainId) => {
+            if (parseInt(chainId, 16) !== 109) {
+                showModal('Switched to wrong network. Please reconnect to Shibarium.');
+                web3 = null;
+                domainContract = null;
+                accounts = null;
+                updateWalletInfo();
+            } else {
+                connectWallet();
+            }
+        });
+
+        window.ethereum?.on('accountsChanged', (newAccounts) => {
+            if (newAccounts.length) {
+                connectWallet();
+            } else {
+                showModal('Wallet disconnected. Please reconnect.');
+                web3 = null;
+                domainContract = null;
+                accounts = null;
+                updateWalletInfo();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            if (!window.location.protocol.startsWith('http')) {
+                showModal('Please run this page via a local server (e.g., "npx serve") to connect MetaMask.');
+            } else if (!window.ethereum) {
+                showModal('No wallet detected. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.');
+            }
+        });
+    </script>
+</body>
+</html>
