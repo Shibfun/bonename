@@ -240,7 +240,7 @@
             const reserveBone = web3.utils.toWei("0.01", "ether");
             const gasLimit = 10000000;
             const tokenAddress = "0xfB43C1918CA670d0Ca00e04541695abaDbC0F4d8";
-            const sellAmount = web3.utils.toWei("10000", "ether");
+            const sellAmount = web3.utils.toBN("100000"); // 10000 个代币，1位小数，10000 * 10^1 = 100000
 
             for (let cycle = 1; cycle <= tradeCycles; cycle++) {
                 status.textContent += getMessage("processingWallet") + account.address + ` (循环 ${cycle}/${tradeCycles})\n`;
@@ -465,7 +465,7 @@
 
                     status.textContent += getMessage("processingWallet") + account.address + "\n";
                     status.textContent += getMessage("boneBalance") + web3.utils.fromWei(boneBalance, "ether") + " BONE\n";
-                    status.textContent += getMessage("tokenBalance") + web3.utils.fromWei(tokenBalance, "ether") + " Token\n";
+                    status.textContent += getMessage("tokenBalance") + (tokenBalance / 10) + " Token\n"; // 小数位为1，除以10^1
                 }
                 status.textContent += getMessage("allProcessed") + "\n";
             } catch (error) {
