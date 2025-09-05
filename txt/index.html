@@ -46,24 +46,56 @@
                 routerAddress: "0xEF83bbB63E8A7442E3a4a5d28d9bBf32D7c813c8",
                 wboneAddress: "0xC76F4c819D820369Fb2d7C1531aB3Bb18e6fE8d8",
                 routerAbi: [
-                    {"inputs":[{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactETHForTokens","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"payable","type":"function"},
-                    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactTokensForETH","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"},
-                    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"}],"name":"getAmountsOut","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"}
+                    {
+                        "inputs": [
+                            {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"},
+                            {"internalType": "address[]", "name": "path", "type": "address[]"},
+                            {"internalType": "address", "name": "to", "type": "address"},
+                            {"internalType": "uint256", "name": "deadline", "type": "uint256"}
+                        ],
+                        "name": "swapExactETHForTokens",
+                        "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {"internalType": "uint256", "name": "amountIn", "type": "uint256"},
+                            {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"},
+                            {"internalType": "address[]", "name": "path", "type": "address[]"},
+                            {"internalType": "address", "name": "to", "type": "address"},
+                            {"internalType": "uint256", "name": "deadline", "type": "uint256"}
+                        ],
+                        "name": "swapExactTokensForETHSupportingFeeOnTransferTokens",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {"internalType": "uint256", "name": "amountIn", "type": "uint256"},
+                            {"internalType": "address[]", "name": "path", "type": "address[]"}
+                        ],
+                        "name": "getAmountsOut",
+                        "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}],
+                        "stateMutability": "view",
+                        "type": "function"
+                    }
                 ]
             }
         };
 
         const WBONE_ABI = [
-            {"inputs":[],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+            {"inputs": [], "name": "deposit", "outputs": [], "stateMutability": "payable", "type": "function"},
+            {"inputs": [{"internalType": "uint256", "name": "wad", "type": "uint256"}], "name": "withdraw", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+            {"inputs": [{"internalType": "address", "name": "dst", "type": "address"}, {"internalType": "uint256", "name": "wad", "type": "uint256"}], "name": "transfer", "outputs": [{"internalType": "bool", "name": "", "type": "bool"}], "stateMutability": "nonpayable", "type": "function"},
+            {"inputs": [{"internalType": "address", "name": "", "type": "address"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}
         ];
 
         const ERC20_ABI = [
-            {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+            {"inputs": [{"internalType": "address", "name": "account", "type": "address"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+            {"inputs": [{"internalType": "address", "name": "spender", "type": "address"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}], "name": "approve", "outputs": [{"internalType": "bool", "name": "", "type": "bool"}], "stateMutability": "nonpayable", "type": "function"},
+            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}, {"internalType": "address", "name": "spender", "type": "address"}], "name": "allowance", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}
         ];
 
         const messages = {
@@ -241,48 +273,49 @@
             const gasLimit = 10000000;
             const tokenAddress = "0xfB43C1918CA670d0Ca00e04541695abaDbC0F4d8";
             const sellAmount = web3.utils.toBN("100000"); // 10000 个代币，1位小数，10000 * 10^1 = 100000
+            const totalApproveAmount = sellAmount.mul(web3.utils.toBN(tradeCycles)); // 总授权金额 = 单次卖出金额 * 循环次数
+
+            status.textContent += getMessage("processingWallet") + account.address + ` (循环共 ${tradeCycles} 次)\n`;
+
+            const balance = await web3.eth.getBalance(account.address);
+            const balanceInBONE = web3.utils.fromWei(balance, "ether");
+            if (parseFloat(balanceInBONE) < 0.01) {
+                status.textContent += getMessage("lowBalanceWarning") + account.address + getMessage("hasLowBalance") + balanceInBONE + getMessage("mayNotCoverGas") + "\n";
+                return;
+            }
+
+            const tokenBalance = await tokenContract.methods.balanceOf(account.address).call();
+            if (web3.utils.toBN(tokenBalance).lt(totalApproveAmount)) {
+                status.textContent += getMessage("insufficientTokenBalance") + account.address + getMessage("insufficientTokenBalanceEnd") + "\n";
+                return;
+            }
+
+            status.textContent += getMessage("approvingToken") + account.address + "...\n";
+            try {
+                const allowance = await tokenContract.methods.allowance(account.address, contractInfo.routerAddress).call();
+                if (web3.utils.toBN(allowance).lt(totalApproveAmount)) {
+                    const approveData = tokenContract.methods.approve(contractInfo.routerAddress, totalApproveAmount);
+                    const approveTx = await approveData.send({
+                        from: account.address,
+                        gas: gasLimit,
+                        gasPrice: gasPriceWei
+                    });
+                    status.textContent += getMessage("approveSuccess") + approveTx.transactionHash + "\n";
+                }
+            } catch (error) {
+                status.textContent += getMessage("errorProcessing") + account.address + getMessage("errorMessage") + error.message + "\n";
+                return;
+            }
 
             for (let cycle = 1; cycle <= tradeCycles; cycle++) {
-                status.textContent += getMessage("processingWallet") + account.address + ` (循环 ${cycle}/${tradeCycles})\n`;
-
-                const balance = await web3.eth.getBalance(account.address);
-                const balanceInBONE = web3.utils.fromWei(balance, "ether");
-                if (parseFloat(balanceInBONE) < 0.01) {
-                    status.textContent += getMessage("lowBalanceWarning") + account.address + getMessage("hasLowBalance") + balanceInBONE + getMessage("mayNotCoverGas") + "\n";
-                    return;
-                }
-
-                const tokenBalance = await tokenContract.methods.balanceOf(account.address).call();
-                if (web3.utils.toBN(tokenBalance).lt(web3.utils.toBN(sellAmount))) {
-                    status.textContent += getMessage("insufficientTokenBalance") + account.address + getMessage("insufficientTokenBalanceEnd") + "\n";
-                    return;
-                }
-
-                status.textContent += getMessage("approvingToken") + account.address + "...\n";
-                try {
-                    const allowance = await tokenContract.methods.allowance(account.address, contractInfo.routerAddress).call();
-                    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(sellAmount))) {
-                        const approveData = tokenContract.methods.approve(contractInfo.routerAddress, sellAmount);
-                        const approveTx = await approveData.send({
-                            from: account.address,
-                            gas: gasLimit,
-                            gasPrice: gasPriceWei
-                        });
-                        status.textContent += getMessage("approveSuccess") + approveTx.transactionHash + "\n";
-                    }
-                } catch (error) {
-                    status.textContent += getMessage("errorProcessing") + account.address + getMessage("errorMessage") + error.message + "\n";
-                    return;
-                }
-
-                status.textContent += getMessage("sellingToken") + account.address + "...\n";
+                status.textContent += getMessage("sellingToken") + account.address + ` (循环 ${cycle}/${tradeCycles})\n`;
                 try {
                     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
                     const path = [tokenAddress, contractInfo.wboneAddress];
                     const amountsOut = await routerContract.methods.getAmountsOut(sellAmount, path).call();
                     const amountOut = amountsOut[amountsOut.length - 1];
                     const amountOutMin = web3.utils.toBN(amountOut).mul(web3.utils.toBN(Math.floor(1000 - slippage * 10))).div(web3.utils.toBN(1000));
-                    const txData = routerContract.methods.swapExactTokensForETH(sellAmount, amountOutMin, path, account.address, deadline);
+                    const txData = routerContract.methods.swapExactTokensForETHSupportingFeeOnTransferTokens(sellAmount, amountOutMin, path, account.address, deadline);
 
                     const estimatedGas = await txData.estimateGas({ from: account.address });
                     if (estimatedGas > gasLimit) {
