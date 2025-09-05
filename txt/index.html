@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="title">Swap TXNS Management</title>
+    <title id="title">Swap 交易管理</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         textarea { width: 100%; height: 200px; margin-bottom: 10px; }
@@ -16,59 +16,33 @@
     </style>
 </head>
 <body onload="updateLanguage()">
-    <h1 id="title">Swap TXNS Management</h1>
+    <h1 id="title">Swap 交易管理</h1>
     <div class="settings">
-        <label id="labelRpcUrl">Shibarium RPC URL: <input type="text" id="rpcUrl" value="https://www.shibrpc.com"></label>
-        <label id="labelChainId">Chain ID: <input type="text" id="chainId" value="109" readonly></label>
-        <label id="labelNetworkName">Network Name: <input type="text" id="networkName" value="Shibarium" readonly></label>
-        <label id="labelCurrencySymbol">Currency Symbol: <input type="text" id="currencySymbol" value="BONE" readonly></label>
-        <label id="labelBlockExplorer">Block Explorer: <input type="text" id="blockExplorer" value="https://www.shibariumscan.io" readonly></label>
-        <label id="labelSwap">Swap Platform: <select id="swapPlatform">
-            <option value="woofswap">WoofSwap</option>
-            <option value="chewyswap">ChewySwap</option>
-            <option value="shibaswap">Shibaswap v1</option>
-        </select></label>
-        <label id="labelLanguage">Language: <select id="language" onchange="updateLanguage()">
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-        </select></label>
+        <label id="labelRpcUrl">Shibarium RPC 地址: <input type="text" id="rpcUrl" value="https://www.shibrpc.com"></label>
+        <label id="labelChainId">链 ID: <input type="text" id="chainId" value="109" readonly></label>
+        <label id="labelNetworkName">网络名称: <input type="text" id="networkName" value="Shibarium" readonly></label>
+        <label id="labelCurrencySymbol">货币符号: <input type="text" id="currencySymbol" value="BONE" readonly></label>
+        <label id="labelBlockExplorer">区块浏览器: <input type="text" id="blockExplorer" value="https://www.shibariumscan.io" readonly></label>
     </div>
-    <p id="labelPrivateKeys">Enter one private key per line (with "0x" prefix):</p>
-    <textarea id="privateKeys" placeholder="e.g.\n0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"></textarea>
+    <p id="labelPrivateKeys">每行输入一个私钥 (带 "0x" 前缀):</p>
+    <textarea id="privateKeys" placeholder="例如:\n0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"></textarea>
     <div class="settings">
-        <label id="labelTokenAddress">Target Token Address: <input type="text" id="tokenAddress" placeholder="e.g. 0x63A67329f761517570345eE86f791F74f9DC5461"></label>
-        <label id="labelAmountMin">Min BONE Amount: <input type="number" id="amountMin" value="0.01" step="0.001" min="0.001"></label>
-        <label id="labelAmountMax">Max BONE Amount: <input type="number" id="amountMax" value="0.03" step="0.001" min="0.001"></label>
-        <label id="labelSlippage">Slippage (%): <input type="number" id="slippage" value="1" step="0.1" min="0.1" max="100"></label>
-        <label id="labelGasPrice">Gas Price (Gwei): <input type="number" id="gasPrice" value="3.2" step="0.1" min="0"></label>
-        <label id="labelGasLimit">Gas Limit: <input type="number" id="gasLimit" value="400000" min="21000"></label>
-        <label id="labelProcessInterval">Process Interval (seconds): <input type="number" id="processInterval" value="5" min="1"></label>
-        <label id="labelTradeCycles">Trade Cycles: <input type="number" id="tradeCycles" value="1" min="1"></label>
+        <label id="labelTokenAddress">目标代币地址: <input type="text" id="tokenAddress" placeholder="例如: 0x63A67329f761517570345eE86f791F74f9DC5461"></label>
+        <label id="labelAmountMin">最小 BONE 数量: <input type="number" id="amountMin" value="0.01" step="0.001" min="0.001"></label>
+        <label id="labelAmountMax">最大 BONE 数量: <input type="number" id="amountMax" value="0.03" step="0.001" min="0.001"></label>
+        <label id="labelSlippage">滑点 (%): <input type="number" id="slippage" value="6" step="0.1" min="0.1" max="100"></label>
+        <label id="labelGasPrice">Gas 价格 (Gwei): <input type="number" id="gasPrice" value="10" step="0.1" min="0"></label>
+        <label id="labelGasLimit">Gas 限制: <input type="number" id="gasLimit" value="400000" min="21000" max="10000000"></label>
+        <label id="labelProcessInterval">处理间隔 (秒): <input type="number" id="processInterval" value="5" min="1"></label>
+        <label id="labelTradeCycles">交易循环次数: <input type="number" id="tradeCycles" value="1" min="1"></label>
     </div>
-    <button id="purchaseButton" onclick="purchaseTokens()">Batch Purchase Tokens</button>
-    <button id="checkBalanceButton" onclick="checkBalances()">Check Balances</button>
-    <div id="status">Status: Ready</div>
+    <button id="purchaseButton" onclick="purchaseTokens()">批量购买代币</button>
+    <button id="checkBalanceButton" onclick="checkBalances()">检查余额</button>
+    <div id="status">状态: 准备就绪</div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
     <script>
         const CONTRACTS = {
-            woofswap: {
-                routerAddress: "0x96b16aBD53Bfd765F4CD118590C1d0be8B57DE24",
-                wboneAddress: "0x839FdB6cc98342B428E074C1573ADF6D48CA3bFd",
-                routerAbi: [
-                    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"components":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"bool","name":"stable","type":"bool"}],"internalType":"struct Router.route[]","name":"routes","type":"tuple[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactTokensForTokens","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"},
-                    {"inputs":[{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"components":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"bool","name":"stable","type":"bool"}],"internalType":"struct Router.route[]","name":"routes","type":"tuple[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactETHForTokens","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"payable","type":"function"},
-                    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"components":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"bool","name":"stable","type":"bool"}],"internalType":"struct Router.route[]","name":"routes","type":"tuple[]"}],"name":"getAmountsOut","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"}
-                ]
-            },
-            chewyswap: {
-                routerAddress: "0x2875F2D86d83635A859029872e745581530cEec7",
-                wboneAddress: "0xC76F4c819D820369Fb2d7C1531aB3Bb18e6fE8d8",
-                routerAbi: [
-                    {"inputs":[{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactETHForTokens","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"payable","type":"function"},
-                    {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"}],"name":"getAmountsOut","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"}
-                ]
-            },
             shibaswap: {
                 routerAddress: "0xEF83bbB63E8A7442E3a4a5d28d9bBf32D7c813c8",
                 wboneAddress: "0xC76F4c819D820369Fb2d7C1531aB3Bb18e6fE8d8",
@@ -91,57 +65,6 @@
         ];
 
         const messages = {
-            en: {
-                title: "Swap TXNS Management",
-                labelRpcUrl: "Shibarium RPC URL: ",
-                labelChainId: "Chain ID: ",
-                labelNetworkName: "Network Name: ",
-                labelCurrencySymbol: "Currency Symbol: ",
-                labelBlockExplorer: "Block Explorer: ",
-                labelSwap: "Swap Platform: ",
-                labelLanguage: "Language: ",
-                labelPrivateKeys: "Enter one private key per line (with \"0x\" prefix):",
-                privateKeysPlaceholder: "e.g.\n0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-                labelTokenAddress: "Target Token Address: ",
-                labelAmountMin: "Min BONE Amount: ",
-                labelAmountMax: "Max BONE Amount: ",
-                labelSlippage: "Slippage (%): ",
-                labelGasPrice: "Gas Price (Gwei): ",
-                labelGasLimit: "Gas Limit: ",
-                labelProcessInterval: "Process Interval (seconds): ",
-                labelTradeCycles: "Trade Cycles: ",
-                purchaseButton: "Batch Purchase Tokens",
-                checkBalanceButton: "Check Balances",
-                statusStarting: "Status: Starting...",
-                statusReady: "Status: Ready",
-                testingRPC: "Testing RPC connection...",
-                connectedToChain: "Connected to chain ID: ",
-                expectedChain: " (Shibarium should be 109)",
-                chainMismatch: "Error: Not connected to Shibarium network (chain ID should be 109).",
-                rpcError: "Error: Failed to connect to RPC: ",
-                noPrivateKeys: "Error: No private keys provided.",
-                invalidPrivateKey: "Error: Invalid private key: ",
-                invalidTokenAddress: "Error: Invalid token address.",
-                invalidAmountRange: "Error: Max BONE amount must be greater than Min BONE amount.",
-                invalidSlippage: "Error: Slippage must be between 0.1% and 100%.",
-                invalidGasPrice: "Error: Invalid Gas Price.",
-                invalidGasLimit: "Error: Invalid Gas Limit (minimum 21000).",
-                invalidInterval: "Error: Invalid Process Interval (minimum 1 second).",
-                invalidTradeCycles: "Error: Invalid Trade Cycles (minimum 1).",
-                processingWallet: "Processing wallet ",
-                boneBalance: "BONE Balance: ",
-                tokenBalance: "Token Balance: ",
-                purchasingToken: "Purchasing token for ",
-                lowBalanceWarning: "Warning: Wallet ",
-                hasLowBalance: " has low BONE balance (",
-                mayNotCoverGas: "), may not cover Gas fees.",
-                purchaseSuccess: "Purchase successful! Tx: ",
-                errorProcessing: "Error processing ",
-                errorMessage: ": ",
-                allProcessed: "All wallets processed. Done!",
-                generalError: "Error: ",
-                suggestedGasPrice: "Suggested Gas Price: "
-            },
             zh: {
                 title: "Swap 交易管理",
                 labelRpcUrl: "Shibarium RPC 地址: ",
@@ -149,10 +72,6 @@
                 labelNetworkName: "网络名称: ",
                 labelCurrencySymbol: "货币符号: ",
                 labelBlockExplorer: "区块浏览器: ",
-                labelSwap: "Swap 平台: ",
-                labelLanguage: "语言: ",
-                labelPrivateKeys: "每行输入一个私钥 (带 \"0x\" 前缀):",
-                privateKeysPlaceholder: "例如:\n0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
                 labelTokenAddress: "目标代币地址: ",
                 labelAmountMin: "最小 BONE 数量: ",
                 labelAmountMax: "最大 BONE 数量: ",
@@ -176,7 +95,7 @@
                 invalidAmountRange: "错误: 最大 BONE 数量必须大于最小 BONE 数量。",
                 invalidSlippage: "错误: 滑点必须在 0.1% 到 100% 之间。",
                 invalidGasPrice: "错误: 无效的 Gas 价格。",
-                invalidGasLimit: "错误: 无效的 Gas 限制 (最小 21000)。",
+                invalidGasLimit: "错误: 无效的 Gas 限制 (最小 21000，最大 10000000)。",
                 invalidInterval: "错误: 无效的处理间隔 (最小 1 秒)。",
                 invalidTradeCycles: "错误: 无效的交易循环次数 (最小 1)。",
                 processingWallet: "正在处理钱包 ",
@@ -196,8 +115,7 @@
         };
 
         function getMessage(key) {
-            const lang = document.getElementById("language").value;
-            return messages[lang][key] || key;
+            return messages.zh[key] || key;
         }
 
         function updateLanguage() {
@@ -207,8 +125,6 @@
             document.getElementById("labelNetworkName").firstChild.nodeValue = getMessage("labelNetworkName");
             document.getElementById("labelCurrencySymbol").firstChild.nodeValue = getMessage("labelCurrencySymbol");
             document.getElementById("labelBlockExplorer").firstChild.nodeValue = getMessage("labelBlockExplorer");
-            document.getElementById("labelSwap").firstChild.nodeValue = getMessage("labelSwap");
-            document.getElementById("labelLanguage").firstChild.nodeValue = getMessage("labelLanguage");
             document.getElementById("labelPrivateKeys").textContent = getMessage("labelPrivateKeys");
             document.getElementById("privateKeys").placeholder = getMessage("privateKeysPlaceholder");
             document.getElementById("labelTokenAddress").firstChild.nodeValue = getMessage("labelTokenAddress");
@@ -231,7 +147,7 @@
             const status = document.getElementById("status");
 
             if (!rpcUrl) {
-                status.textContent += getMessage("rpcError") + "Please provide a valid Shibarium RPC URL.\n";
+                status.textContent += getMessage("rpcError") + "请输入有效的 Shibarium RPC 地址。\n";
                 return null;
             }
 
@@ -255,13 +171,13 @@
             return min + Math.random() * (max - min);
         }
 
-        async function tradeCycle(web3, account, tokenAddress, swapPlatform, contractInfo, gasPriceWei, gasLimit, processInterval, tradeCycles, amountMin, amountMax, slippage) {
+        async function tradeCycle(web3, account, tokenAddress, contractInfo, gasPriceWei, gasLimit, processInterval, tradeCycles, amountMin, amountMax, slippage) {
             const status = document.getElementById("status");
             const routerContract = new web3.eth.Contract(contractInfo.routerAbi, contractInfo.routerAddress);
             const reserveBone = web3.utils.toWei("0.01", "ether");
 
             for (let cycle = 1; cycle <= tradeCycles; cycle++) {
-                status.textContent += getMessage("processingWallet") + account.address + ` (Cycle ${cycle}/${tradeCycles})\n`;
+                status.textContent += getMessage("processingWallet") + account.address + ` (循环 ${cycle}/${tradeCycles})\n`;
 
                 const balance = await web3.eth.getBalance(account.address);
                 const balanceInBONE = web3.utils.fromWei(balance, "ether");
@@ -281,24 +197,15 @@
                 status.textContent += getMessage("purchasingToken") + account.address + "...\n";
                 try {
                     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
-                    let amountOutMin;
-                    if (swapPlatform === "woofswap") {
-                        const routes = [{ from: contractInfo.wboneAddress, to: tokenAddress, stable: false }];
-                        const amountsOut = await routerContract.methods.getAmountsOut(boneWei, routes).call();
-                        const amountOut = amountsOut[amountsOut.length - 1];
-                        amountOutMin = web3.utils.toBN(amountOut).mul(web3.utils.toBN(Math.floor(1000 - slippage * 10))).div(web3.utils.toBN(1000));
-                        txData = routerContract.methods.swapExactETHForTokens(amountOutMin, routes, account.address, deadline);
-                    } else {
-                        const path = [contractInfo.wboneAddress, tokenAddress];
-                        const amountsOut = await routerContract.methods.getAmountsOut(boneWei, path).call();
-                        const amountOut = amountsOut[amountsOut.length - 1];
-                        amountOutMin = web3.utils.toBN(amountOut).mul(web3.utils.toBN(Math.floor(1000 - slippage * 10))).div(web3.utils.toBN(1000));
-                        txData = routerContract.methods.swapExactETHForTokens(amountOutMin, path, account.address, deadline);
-                    }
+                    const path = [contractInfo.wboneAddress, tokenAddress];
+                    const amountsOut = await routerContract.methods.getAmountsOut(boneWei, path).call();
+                    const amountOut = amountsOut[amountsOut.length - 1];
+                    const amountOutMin = web3.utils.toBN(amountOut).mul(web3.utils.toBN(Math.floor(1000 - slippage * 10))).div(web3.utils.toBN(1000));
+                    const txData = routerContract.methods.swapExactETHForTokens(amountOutMin, path, account.address, deadline);
 
                     const estimatedGas = await txData.estimateGas({ from: account.address, value: boneWei });
                     if (estimatedGas > gasLimit) {
-                        status.textContent += getMessage("errorProcessing") + account.address + getMessage("errorMessage") + "Gas limit too low, estimated: " + estimatedGas + "\n";
+                        status.textContent += getMessage("errorProcessing") + account.address + getMessage("errorMessage") + "Gas 限制过低，预计: " + estimatedGas + "\n";
                         return;
                     }
 
@@ -325,8 +232,7 @@
             const web3 = await initializeWeb3();
             if (!web3) return;
 
-            const swapPlatform = document.getElementById("swapPlatform").value;
-            const contractInfo = CONTRACTS[swapPlatform];
+            const contractInfo = CONTRACTS.shibaswap;
             const routerContract = new web3.eth.Contract(contractInfo.routerAbi, contractInfo.routerAddress);
             const wboneContract = new web3.eth.Contract(WBONE_ABI, contractInfo.wboneAddress);
             const privateKeys = document.getElementById("privateKeys").value.trim().split("\n").filter(key => key.length > 0);
@@ -359,7 +265,7 @@
                 status.textContent += getMessage("invalidGasPrice") + "\n";
                 return;
             }
-            if (isNaN(gasLimit) || gasLimit < 21000) {
+            if (isNaN(gasLimit) || gasLimit < 21000 || gasLimit > 10000000) {
                 status.textContent += getMessage("invalidGasLimit") + "\n";
                 return;
             }
@@ -387,7 +293,7 @@
                         return;
                     }
                     web3.eth.accounts.wallet.add(account);
-                    await tradeCycle(web3, account, tokenAddress, swapPlatform, contractInfo, gasPriceWei, gasLimit, processInterval, tradeCycles, amountMin, amountMax, slippage);
+                    await tradeCycle(web3, account, tokenAddress, contractInfo, gasPriceWei, gasLimit, processInterval, tradeCycles, amountMin, amountMax, slippage);
                     web3.eth.accounts.wallet.remove(account.address);
                 });
 
@@ -405,8 +311,7 @@
             const web3 = await initializeWeb3();
             if (!web3) return;
 
-            const swapPlatform = document.getElementById("swapPlatform").value;
-            const contractInfo = CONTRACTS[swapPlatform];
+            const contractInfo = CONTRACTS.shibaswap;
             const wboneContract = new web3.eth.Contract(WBONE_ABI, contractInfo.wboneAddress);
             const tokenAddress = document.getElementById("tokenAddress").value.trim();
             const privateKeys = document.getElementById("privateKeys").value.trim().split("\n").filter(key => key.length > 0);
