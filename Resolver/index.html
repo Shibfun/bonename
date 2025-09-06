@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shiba Domain Resolver - Shibarium</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="https://woofswap.finance/image/tokens/woof.png" type="image/gif">
+    <link rel="icon" href="https://woofswap.finance/image/tokens/shiba.gif" type="image/gif">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary-color: #ff9100;
             --secondary-color: #ff6f61;
+            --accent-color: #f4c430;
             --background: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
             --card-bg: #2c2f48;
             --input-bg: #373b5c;
             --text-color: #ffffff;
-            --accent-color: #f4c430;
             --border-radius: 15px;
         }
         body { 
@@ -34,7 +34,6 @@
             border-radius: var(--border-radius); 
             padding: 25px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
-            position: relative; 
             border: 2px solid var(--primary-color); 
         }
         h1 { 
@@ -169,6 +168,20 @@
             opacity: 0.7; 
             pointer-events: none; 
         }
+        .spinner { 
+            display: inline-block; 
+            width: 16px; 
+            height: 16px; 
+            border: 2px solid #fff; 
+            border-top: 2px solid var(--primary-color); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-left: 5px; 
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         @media (max-width: 480px) {
             body { padding: 10px; }
             .container { padding: 15px; }
@@ -254,8 +267,11 @@
             ], contractAddress);
             try {
                 const owner = await erc721Contract.methods.ownerOf(tokenId).call();
-                return owner.toLowerCase() === accounts[0].toLowerCase();
-            } catch {
+                const isOwner = owner.toLowerCase() === accounts[0].toLowerCase();
+                console.log(`Token ID ${tokenId} ownership check: Owner=${owner}, Wallet=${accounts[0]}, IsOwner=${isOwner}`);
+                return isOwner;
+            } catch (error) {
+                console.error(`Ownership check failed for Token ID ${tokenId}:`, error);
                 return false;
             }
         }
@@ -269,7 +285,7 @@
                     dogMessage.innerText = "Woof! MetaMask not found, pup!";
                     return;
                 }
-                status.innerText = "Connecting...";
+                status.innerText = "Connecting... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Connecting your wallet, pup!";
                 web3 = new Web3(window.ethereum);
                 accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -295,9 +311,15 @@
                                 }]
                             });
                         } else {
-                            throw switchError;
+                            throw new Error("Failed to switch to Shibarium: " + switchError.message);
                         }
                     }
+                }
+                const newChainId = await web3.eth.getChainId();
+                if (newChainId !== 109) {
+                    status.innerText = "Please switch to Shibarium network (Chain ID: 109)";
+                    dogMessage.innerText = "Woof! Wrong network, switch to Shibarium, pup!";
+                    return;
                 }
                 document.getElementById('walletAddress').innerText = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
                 resolverContract = new web3.eth.Contract(resolverContractABI, contractAddress);
@@ -306,6 +328,7 @@
             } catch (error) {
                 status.innerText = "Connection failed: " + error.message;
                 dogMessage.innerText = "Woof! Couldn't connect wallet, try again, pup!";
+                console.error("Wallet connection error:", error);
             }
         }
 
@@ -321,8 +344,10 @@
             try {
                 document.execCommand('copy');
                 status.textContent = 'Contract address copied to clipboard';
+                document.getElementById('dogMessage').innerText = "Woof! Address copied, pup!";
             } catch {
                 status.textContent = 'Failed to copy contract address';
+                document.getElementById('dogMessage').innerText = "Woof! Copy failed, try again, pup!";
             } finally {
                 document.body.removeChild(textArea);
             }
@@ -345,12 +370,13 @@
             }
             try {
                 section.classList.add('loading');
-                status.innerText = "Checking domain status...";
+                status.innerText = "Checking domain status... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Checking your .bone domain, pup!";
                 const isOwned = await checkTokenOwnership(contractAddress, tokenId);
                 if (!isOwned) {
-                    status.innerText = "This address does not own the Token ID";
-                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    status.innerText = `This wallet does not own Token ID ${tokenId}. Verify ownership on Shibarium.`;
+                    dogMessage.innerText = "Woof! You don't own this domain, pup! Check your wallet or Token ID.";
+                    console.log(`Token ID ${tokenId} not owned by ${accounts[0]}. Check Shibarium explorer: ${shibarium.explorerUrl}/address/${contractAddress}`);
                     return;
                 }
                 const isResolved = await resolverContract.methods.isTokenResolved(contractAddress, tokenId).call();
@@ -361,12 +387,12 @@
                         dogMessage.innerText = "Woof! This domain is already yours, pup!";
                         return;
                     } else {
-                        status.innerText = `Domain ${resolution.domainName} is resolved by another address`;
+                        status.innerText = `Domain ${resolution.domainName} is resolved by another wallet`;
                         dogMessage.innerText = "Woof! Someone else claimed this domain, pup!";
                         return;
                     }
                 }
-                status.innerText = "Resolving domain...";
+                status.innerText = "Resolving domain... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Resolving your domain, hold tight, pup!";
                 const gas = await resolverContract.methods.resolveDomain(contractAddress, tokenId).estimateGas({ from: accounts[0] }).catch(() => 600000);
                 const tx = await resolverContract.methods.resolveDomain(contractAddress, tokenId).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
@@ -377,6 +403,7 @@
             } catch (error) {
                 status.innerText = "Failed to resolve domain: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
                 dogMessage.innerText = "Woof! Something went wrong, try again, pup!";
+                console.error("Domain resolution error:", error);
             } finally {
                 section.classList.remove('loading');
             }
@@ -405,15 +432,16 @@
             }
             try {
                 section.classList.add('loading');
-                status.innerText = "Checking ownership...";
+                status.innerText = "Checking ownership... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Checking your domain ownership, pup!";
                 const isOwned = await checkTokenOwnership(contractAddress, tokenId);
                 if (!isOwned) {
-                    status.innerText = "This address does not own the Token ID";
-                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    status.innerText = `This wallet does not own Token ID ${tokenId}. Verify ownership on Shibarium.`;
+                    dogMessage.innerText = "Woof! You don't own this domain, pup! Check your wallet or Token ID.";
+                    console.log(`Token ID ${tokenId} not owned by ${accounts[0]}. Check Shibarium explorer: ${shibarium.explorerUrl}/address/${contractAddress}`);
                     return;
                 }
-                status.innerText = "Setting URL...";
+                status.innerText = "Setting URL... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Setting your URL, pup!";
                 const gas = await resolverContract.methods.resolveUrl(contractAddress, tokenId, url).estimateGas({ from: accounts[0] }).catch(() => 600000);
                 const tx = await resolverContract.methods.resolveUrl(contractAddress, tokenId, url).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
@@ -423,6 +451,7 @@
             } catch (error) {
                 status.innerText = "Failed to set URL: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
                 dogMessage.innerText = "Woof! URL setting failed, try again, pup!";
+                console.error("URL setting error:", error);
             } finally {
                 section.classList.remove('loading');
             }
@@ -451,15 +480,16 @@
             }
             try {
                 section.classList.add('loading');
-                status.innerText = "Checking ownership...";
+                status.innerText = "Checking ownership... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Checking your domain ownership, pup!";
                 const isOwned = await checkTokenOwnership(contractAddress, tokenId);
                 if (!isOwned) {
-                    status.innerText = "This address does not own the Token ID";
-                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    status.innerText = `This wallet does not own Token ID ${tokenId}. Verify ownership on Shibarium.`;
+                    dogMessage.innerText = "Woof! You don't own this domain, pup! Check your wallet or Token ID.";
+                    console.log(`Token ID ${tokenId} not owned by ${accounts[0]}. Check Shibarium explorer: ${shibarium.explorerUrl}/address/${contractAddress}`);
                     return;
                 }
-                status.innerText = "Setting text...";
+                status.innerText = "Setting text... <span class='spinner'></span>";
                 dogMessage.innerText = "Woof! Setting your text, pup!";
                 const gas = await resolverContract.methods.resolveText(contractAddress, tokenId, text).estimateGas({ from: accounts[0] }).catch(() => 600000);
                 const tx = await resolverContract.methods.resolveText(contractAddress, tokenId, text).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
@@ -469,6 +499,7 @@
             } catch (error) {
                 status.innerText = "Failed to set text: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
                 dogMessage.innerText = "Woof! Text setting failed, try again, pup!";
+                console.error("Text setting error:", error);
             } finally {
                 section.classList.remove('loading');
             }
