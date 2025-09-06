@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiba Domain Browser - Shibarium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://woofswap.finance/image/tokens/shiba.gif" type="image/gif">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary-color: #ff9100;
+            --secondary-color: #ff6f61;
+            --accent-color: #f4c430;
+            --background: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
+            --card-bg: #2c2f48;
+            --input-bg: #373b5c;
+            --text-color: #ffffff;
+            --border-radius: 15px;
+        }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--background); 
+            color: var(--text-color); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: stretch; 
+            padding: 0; 
+        }
+        .container { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+        }
+        .browser-bar { 
+            background: var(--card-bg); 
+            padding: 5px 10px; 
+            border-bottom: 1px solid var(--secondary-color); 
+            display: flex; 
+            align-items: center; 
+            height: 40px; 
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); 
+        }
+        .logo { 
+            width: 120px; 
+            height: 60px; 
+            object-fit: contain; 
+            margin: 5px 10px; 
+            display: inline-block; 
+            vertical-align: middle; 
+            filter: drop-shadow(0 0 10px rgba(255, 145, 0, 0.3)); 
+        }
+        .nav-buttons { 
+            margin-right: 10px; 
+        }
+        .nav-buttons button { 
+            background: var(--primary-color); 
+            border: 1px solid var(--secondary-color); 
+            border-radius: 3px; 
+            padding: 3px 6px; 
+            margin: 0 3px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            height: 24px; 
+            min-width: 50px; 
+            color: var(--text-color); 
+            transition: background 0.3s ease; 
+        }
+        .nav-buttons button:hover { 
+            background: #e68a00; 
+        }
+        .nav-buttons button:disabled { 
+            background: #4a4f7a; 
+            color: #9aa0a6; 
+            cursor: not-allowed; 
+        }
+        .address-bar { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            background: var(--input-bg); 
+            border: 1px solid var(--secondary-color); 
+            border-radius: 16px; 
+            padding: 3px 8px; 
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); 
+        }
+        .address-bar input { 
+            flex: 1; 
+            border: none; 
+            outline: none; 
+            font-size: 12px; 
+            padding: 3px; 
+            background: transparent; 
+            color: var(--text-color); 
+        }
+        .address-bar input::placeholder { 
+            color: #888888; 
+        }
+        .address-bar button { 
+            background: var(--secondary-color); 
+            color: var(--text-color); 
+            border: none; 
+            border-radius: 3px; 
+            padding: 3px 8px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            height: 24px; 
+            min-width: 50px; 
+            transition: background 0.3s ease; 
+        }
+        .address-bar button:hover { 
+            background: #e65b50; 
+        }
+        .browser-content { 
+            width: 100%; 
+            height: calc(100vh - 50px); 
+            border: none; 
+            overflow: hidden; 
+            background: #fff; 
+        }
+        .status { 
+            font-size: 14px; 
+            color: var(--accent-color); 
+            text-align: center; 
+            padding: 10px; 
+        }
+        .footer { 
+            margin-top: 10px; 
+            font-size: 12px; 
+            color: #888888; 
+            text-align: center; 
+        }
+        .footer a { 
+            color: var(--accent-color); 
+            text-decoration: none; 
+        }
+        .footer a:hover { 
+            text-decoration: underline; 
+        }
+        .dog-message { 
+            font-size: 12px; 
+            color: var(--secondary-color); 
+            text-align: center; 
+            padding: 5px; 
+            font-style: italic; 
+        }
+        .spinner { 
+            display: inline-block; 
+            width: 14px; 
+            height: 14px; 
+            border: 2px solid #fff; 
+            border-top: 2px solid var(--primary-color); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-left: 5px; 
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 600px) {
+            .browser-bar { flex-direction: column; padding: 5px; height: auto; }
+            .nav-buttons { margin-bottom: 5px; width: 100%; display: flex; justify-content: space-between; }
+            .nav-buttons button { flex: 1; margin: 0 2px; }
+            .address-bar { width: 100%; margin-top: 5px; }
+            .browser-content { height: calc(100vh - 90px); }
+            .logo { width: 80px; height: 40px; }
+            .dog-message { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="browser-bar">
+            <img src="https://woofswap.finance/image/tokens/shiba.gif" alt="Shiba Domain Browser" class="logo">
+            <div class="nav-buttons">
+                <button id="backButton" disabled>Back</button>
+                <button id="forwardButton" disabled>Forward</button>
+                <button id="refreshButton">Refresh</button>
+            </div>
+            <div class="address-bar">
+                <input type="text" id="domainInput" placeholder="Enter domain (e.g., Test.bone)">
+                <button id="searchButton">Go</button>
+            </div>
+        </div>
+        <div class="dog-message" id="dogMessage">Woof! Enter a .bone domain to browse, pup!</div>
+        <iframe id="browserContent" class="browser-content" src="about:blank"></iframe>
+        <div id="status" class="status"></div>
+        <div class="footer">
+            Powered by <a href="https://shibariumscan.io" target="_blank">Shibarium</a> | Shiba Domain Browser © 2025
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        const shibarium = { explorerUrl: 'https://shibariumscan.io', rpcUrl: 'https://rpc.shibrpc.com' };
+        const resolverContractAddress = '0xc985240426c73270650FABF98EA07e4cfF577faF';
+        const web3 = new Web3(shibarium.rpcUrl);
+        const resolverContract = new web3.eth.Contract([
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"getUrlByDomain","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"isDomainResolved","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+        ], resolverContractAddress);
+
+        function isValidBoneDomain(domain) {
+            const parts = domain.split('.');
+            if (parts.length < 2) return false;
+            const prefix = parts.slice(0, -1).join('.');
+            const suffix = parts[parts.length - 1];
+            return suffix.toLowerCase() === 'bone' && prefix.length > 0 && prefix.length <= 15 && /^[a-zA-Z0-9]+$/.test(prefix);
+        }
+
+        async function navigateToUrl(domainInput) {
+            const iframe = document.getElementById('browserContent');
+            const domainInputField = document.getElementById('domainInput');
+            const status = document.getElementById('status');
+            const dogMessage = document.getElementById('dogMessage');
+            const backButton = document.getElementById('backButton');
+            const forwardButton = document.getElementById('forwardButton');
+
+            const parts = domainInput.split('.');
+            if (parts.length < 2) {
+                status.innerText = "Invalid domain format, please include suffix (e.g., Test.bone)";
+                dogMessage.innerText = "Woof! No suffix in domain, pup!";
+                iframe.src = 'about:blank';
+                return;
+            }
+            const prefix = parts.slice(0, -1).join('.');
+            const suffix = parts[parts.length - 1];
+
+            try {
+                if (!isValidBoneDomain(domainInput)) {
+                    status.innerText = `Unsupported domain suffix or invalid format. Only .bone is supported (alphanumeric prefix, max 15 characters)`;
+                    dogMessage.innerText = "Woof! Only .bone domains allowed, pup!";
+                    iframe.src = 'about:blank';
+                    return;
+                }
+
+                status.innerText = "Checking domain... <span class='spinner'></span>";
+                dogMessage.innerText = `Woof! Checking ${domainInput}, pup!`;
+                let isResolved = await resolverContract.methods.isDomainResolved(domainInput).call();
+                
+                // Fallback to lowercase if exact case fails
+                if (!isResolved) {
+                    const lowerDomain = domainInput.toLowerCase();
+                    status.innerText = `No resolution for "${domainInput}", trying "${lowerDomain}"... <span class='spinner'></span>`;
+                    isResolved = await resolverContract.methods.isDomainResolved(lowerDomain).call();
+                    if (!isResolved) {
+                        status.innerText = `No resolution record found for domain "${domainInput}" or "${lowerDomain}". Check <a href="${shibarium.explorerUrl}/address/${resolverContractAddress}" target="_blank">Shibariumscan</a>.`;
+                        dogMessage.innerText = `Woof! ${domainInput} isn't resolved, pup!`;
+                        iframe.src = 'about:blank';
+                        return;
+                    }
+                    domainInput = lowerDomain; // Use lowercase for URL fetch
+                }
+
+                status.innerText = "Resolving URL... <span class='spinner'></span>";
+                dogMessage.innerText = `Woof! Fetching URL for ${domainInputField.value}, pup!`;
+                const url = await resolverContract.methods.getUrlByDomain(domainInput).call();
+                if (!url || url === "") {
+                    status.innerText = `No valid URL found for "${domainInputField.value}". Set a URL in the resolver contract.`;
+                    dogMessage.innerText = `Woof! No URL set for ${domainInputField.value}, pup!`;
+                    iframe.src = 'about:blank';
+                    return;
+                }
+
+                if (currentIndex < history.length - 1) {
+                    history = history.slice(0, currentIndex + 1);
+                }
+                history.push(domainInputField.value);
+                currentIndex++;
+
+                domainInputField.value = domainInputField.value;
+                iframe.src = url;
+                status.innerText = "";
+                dogMessage.innerText = `Woof! Loaded ${domainInputField.value}, pup!`;
+                backButton.disabled = currentIndex <= 0;
+                forwardButton.disabled = currentIndex >= history.length - 1;
+            } catch (error) {
+                console.error("Error details:", error);
+                const errorMessage = error.message.includes('Invalid JSON RPC response')
+                    ? `Unable to connect to Shibarium RPC. Check network status on <a href="${shibarium.explorerUrl}" target="_blank">Shibariumscan</a> or try again later.`
+                    : error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Contract error' : error.message;
+                status.innerText = `Failed to resolve domain: ${errorMessage}`;
+                dogMessage.innerText = `Woof! Failed to load ${domainInputField.value}, try again, pup!`;
+                iframe.src = 'about:blank';
+            }
+        }
+
+        let history = [];
+        let currentIndex = -1;
+
+        function goBack() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                const domain = history[currentIndex];
+                document.getElementById('domainInput').value = domain;
+                navigateToUrl(domain);
+                updateNavigationButtons();
+            }
+        }
+
+        function goForward() {
+            if (currentIndex < history.length - 1) {
+                currentIndex++;
+                const domain = history[currentIndex];
+                document.getElementById('domainInput').value = domain;
+                navigateToUrl(domain);
+                updateNavigationButtons();
+            }
+        }
+
+        function refresh() {
+            const iframe = document.getElementById('browserContent');
+            if (iframe.src !== 'about:blank') {
+                iframe.contentWindow.location.reload();
+                document.getElementById('dogMessage').innerText = "Woof! Refreshing the page, pup!";
+            }
+        }
+
+        function updateNavigationButtons() {
+            const backButton = document.getElementById('backButton');
+            const forwardButton = document.getElementById('forwardButton');
+            backButton.disabled = currentIndex <= 0;
+            forwardButton.disabled = currentIndex >= history.length - 1;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const domainInput = document.getElementById('domainInput');
+            const searchButton = document.getElementById('searchButton');
+            const backButton = document.getElementById('backButton');
+            const forwardButton = document.getElementById('forwardButton');
+            const refreshButton = document.getElementById('refreshButton');
+
+            searchButton.addEventListener('click', () => {
+                const domainInputValue = domainInput.value.trim();
+                navigateToUrl(domainInputValue);
+            });
+
+            domainInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const domainInputValue = domainInput.value.trim();
+                    navigateToUrl(domainInputValue);
+                }
+            });
+
+            backButton.addEventListener('click', goBack);
+            forwardButton.addEventListener('click', goForward);
+            refreshButton.addEventListener('click', refresh);
+        });
+    </script>
+</body>
+</html>
