@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiba Domain Resolver - Shibarium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://woofswap.finance/image/tokens/woof.png" type="image/gif">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary-color: #ff9100;
+            --secondary-color: #ff6f61;
+            --background: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
+            --card-bg: #2c2f48;
+            --input-bg: #373b5c;
+            --text-color: #ffffff;
+            --accent-color: #f4c430;
+            --border-radius: 15px;
+        }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--background); 
+            color: var(--text-color); 
+            padding: 20px; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .container { 
+            max-width: 600px; 
+            background: var(--card-bg); 
+            border-radius: var(--border-radius); 
+            padding: 25px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
+            position: relative; 
+            border: 2px solid var(--primary-color); 
+        }
+        h1 { 
+            text-align: center; 
+            font-size: clamp(1.8em, 5vw, 2.5em); 
+            font-weight: 700; 
+            color: var(--accent-color); 
+            margin-bottom: 20px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+        }
+        .section { 
+            background: var(--input-bg); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--secondary-color); 
+        }
+        h2 { 
+            font-size: clamp(1.2em, 3.5vw, 1.6em); 
+            color: var(--primary-color); 
+            margin-bottom: 15px; 
+            font-weight: 600; 
+        }
+        .button { 
+            background: var(--primary-color); 
+            color: var(--text-color); 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: var(--border-radius); 
+            font-weight: 600; 
+            font-size: 1em; 
+            cursor: pointer; 
+            transition: background 0.3s ease, transform 0.2s ease; 
+            width: 100%; 
+            margin: 10px 0; 
+        }
+        .button:hover { 
+            background: #e68a00; 
+            transform: translateY(-2px); 
+        }
+        .button:disabled { 
+            background: #4a4f7a; 
+            cursor: not-allowed; 
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: var(--card-bg); 
+            border: 1px solid var(--secondary-color); 
+            border-radius: 10px; 
+            color: var(--text-color); 
+            font-size: 1em; 
+        }
+        input::placeholder { 
+            color: #888888; 
+        }
+        .status { 
+            margin-top: 10px; 
+            font-size: 0.9em; 
+            color: var(--accent-color); 
+            text-align: center; 
+        }
+        .wallet-info { 
+            color: var(--accent-color); 
+            font-weight: 600; 
+            word-break: break-all; 
+        }
+        .output-box { 
+            background: var(--card-bg); 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            font-size: 0.9em; 
+            color: var(--text-color); 
+        }
+        .output-box label { 
+            display: block; 
+            font-size: 0.9em; 
+            margin-bottom: 5px; 
+            color: var(--primary-color); 
+        }
+        .how-it-works { 
+            background: var(--input-bg); 
+            padding: 20px; 
+            border-radius: 10px; 
+            border: 1px solid var(--secondary-color); 
+        }
+        .how-it-works ul { 
+            list-style-type: disc; 
+            padding-left: 20px; 
+            margin-top: 10px; 
+        }
+        .how-it-works li { 
+            margin-bottom: 12px; 
+            font-size: 0.9em; 
+            color: var(--text-color); 
+        }
+        .how-it-works .highlight { 
+            color: var(--accent-color); 
+            font-weight: 600; 
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 0.85em; 
+            color: #888888; 
+        }
+        .footer a { 
+            color: var(--accent-color); 
+            text-decoration: none; 
+        }
+        .footer a:hover { 
+            text-decoration: underline; 
+        }
+        .dog-section { 
+            text-align: center; 
+            margin-top: 20px; 
+        }
+        .dog-section img { 
+            width: 80px; 
+            height: 80px; 
+            margin-bottom: 10px; 
+        }
+        .dog-message { 
+            font-size: 0.9em; 
+            color: var(--secondary-color); 
+            font-style: italic; 
+        }
+        .loading { 
+            opacity: 0.7; 
+            pointer-events: none; 
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            .section, .how-it-works { padding: 15px; }
+            .button { padding: 10px; }
+            .dog-section img { width: 60px; height: 60px; }
+            .dog-message { font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shiba Domain Resolver</h1>
+        <div class="section">
+            <h2>Connect to Shibarium</h2>
+            <button id="connectButton" class="button">Connect Wallet</button>
+            <p>Wallet: <span id="walletAddress" class="wallet-info">Not Connected</span></p>
+            <div id="networkStatus" class="status">Click to connect...</div>
+        </div>
+        <div class="section" id="resolveDomainSection">
+            <h2>Resolve .bone Domain</h2>
+            <input type="text" id="tokenId" placeholder="Enter Token ID (e.g., 123)">
+            <button id="resolveDomain" class="button">Resolve Domain</button>
+            <div class="output-box">
+                <label>Contract Address</label>
+                <span id="contractAddress">0xc985240426c73270650FABF98EA07e4cfF577faF</span>
+            </div>
+            <button id="copyAddressButton" class="button">Copy Contract Address</button>
+            <div id="resolveStatus" class="status"></div>
+        </div>
+        <div class="section" id="resolveUrlSection">
+            <h2>Set URL</h2>
+            <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)">
+            <button id="resolveUrl" class="button">Set URL</button>
+            <div id="urlStatus" class="status"></div>
+        </div>
+        <div class="section" id="resolveTextSection">
+            <h2>Set Text</h2>
+            <input type="text" id="textInput" placeholder="Enter Text (max 500 characters)">
+            <button id="resolveText" class="button">Set Text</button>
+            <div id="textStatus" class="status"></div>
+        </div>
+        <div class="how-it-works">
+            <h2>How It Works?</h2>
+            <p>Resolve and manage your .bone domain NFTs on Shibarium!</p>
+            <ul>
+                <li><strong>Connect Wallet</strong>: Use MetaMask to connect to Shibarium (Chain ID: 109). Ensure you have enough <span class="highlight">BONE</span> for gas fees.</li>
+                <li><strong>Resolve Domain</strong>: Enter the Token ID of your .bone domain NFT to resolve it to your wallet address.</li>
+                <li><strong>Set URL/Text</strong>: Add a URL or text record (up to 500 characters) for your resolved domain.</li>
+                <li><strong>Secure & Unique</strong>: Each .bone domain can only be resolved by one wallet, with low-cost transactions on Shibarium.</li>
+            </ul>
+        </div>
+        <div class="dog-section">
+            <img src="https://woofswap.finance/image/tokens/shiba.gif" alt="Shiba Dog">
+            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to start resolving, pup!"</div>
+        </div>
+        <div class="footer">
+            Powered by <a href="https://shibariumscan.io" target="_blank">Shibarium</a> | Domain Resolver © 2025
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        let web3, accounts, resolverContract;
+        const shibarium = { chainId: 109, name: 'Shibarium', explorerUrl: 'https://shibariumscan.io', rpcUrl: 'https://rpc.shibariumchain.com' };
+        const contractAddress = '0xc985240426c73270650FABF98EA07e4cfF577faF';
+        const resolverContractABI = [
+            {"inputs":[{"internalType":"address","name":"contractAddress","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"resolveDomain","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"contractAddress","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"string","name":"url","type":"string"}],"name":"resolveUrl","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"contractAddress","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"string","name":"text","type":"string"}],"name":"resolveText","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"getWalletByDomain","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"wallet","type":"address"}],"name":"getDomainsByWallet","outputs":[{"internalType":"string[]","name":"","type":"string[]"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"getUrlByDomain","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"getTextByDomain","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"contractAddress","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getResolution","outputs":[{"components":[{"internalType":"string","name":"domainName","type":"string"},{"internalType":"address","name":"walletAddress","type":"address"},{"internalType":"string","name":"url","type":"string"},{"internalType":"string","name":"text","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct DomainResolver.Resolution","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"domainName","type":"string"}],"name":"isDomainResolved","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"contractAddress","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"isTokenResolved","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+        ];
+
+        async function checkTokenOwnership(contractAddress, tokenId) {
+            const erc721Contract = new web3.eth.Contract([
+                {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+            ], contractAddress);
+            try {
+                const owner = await erc721Contract.methods.ownerOf(tokenId).call();
+                return owner.toLowerCase() === accounts[0].toLowerCase();
+            } catch {
+                return false;
+            }
+        }
+
+        async function connectWallet() {
+            const status = document.getElementById('networkStatus');
+            const dogMessage = document.getElementById('dogMessage');
+            try {
+                if (!window.ethereum) {
+                    status.innerHTML = 'No wallet detected. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
+                    dogMessage.innerText = "Woof! MetaMask not found, pup!";
+                    return;
+                }
+                status.innerText = "Connecting...";
+                dogMessage.innerText = "Woof! Connecting your wallet, pup!";
+                web3 = new Web3(window.ethereum);
+                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (!accounts.length) {
+                    status.innerText = "Please unlock or connect your wallet";
+                    dogMessage.innerText = "Woof! Wallet not connected, pup!";
+                    return;
+                }
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== 109) {
+                    try {
+                        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x6d' }] });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x6d',
+                                    chainName: 'Shibarium',
+                                    nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
+                                    rpcUrls: ['https://rpc.shibariumchain.com'],
+                                    blockExplorerUrls: ['https://shibariumscan.io']
+                                }]
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+                document.getElementById('walletAddress').innerText = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+                resolverContract = new web3.eth.Contract(resolverContractABI, contractAddress);
+                status.innerText = "Connected to Shibarium";
+                dogMessage.innerText = "Woof! Wallet connected, ready to resolve, pup!";
+            } catch (error) {
+                status.innerText = "Connection failed: " + error.message;
+                dogMessage.innerText = "Woof! Couldn't connect wallet, try again, pup!";
+            }
+        }
+
+        function copyToClipboard() {
+            const status = document.getElementById('resolveStatus');
+            const contractAddress = document.getElementById('contractAddress').textContent;
+            const textArea = document.createElement('textarea');
+            textArea.value = contractAddress;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                status.textContent = 'Contract address copied to clipboard';
+            } catch {
+                status.textContent = 'Failed to copy contract address';
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        async function resolveDomain() {
+            const section = document.getElementById('resolveDomainSection');
+            const status = document.getElementById('resolveStatus');
+            const dogMessage = document.getElementById('dogMessage');
+            const tokenId = document.getElementById('tokenId').value.trim();
+            if (!tokenId || isNaN(tokenId) || Number(tokenId) < 0) {
+                status.innerText = "Please enter a valid Token ID (positive integer)";
+                dogMessage.innerText = "Woof! Invalid Token ID, pup!";
+                return;
+            }
+            if (!accounts) {
+                status.innerText = "Please connect your wallet first!";
+                dogMessage.innerText = "Woof! Connect your wallet, pup!";
+                return;
+            }
+            try {
+                section.classList.add('loading');
+                status.innerText = "Checking domain status...";
+                dogMessage.innerText = "Woof! Checking your .bone domain, pup!";
+                const isOwned = await checkTokenOwnership(contractAddress, tokenId);
+                if (!isOwned) {
+                    status.innerText = "This address does not own the Token ID";
+                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    return;
+                }
+                const isResolved = await resolverContract.methods.isTokenResolved(contractAddress, tokenId).call();
+                if (isResolved) {
+                    const resolution = await resolverContract.methods.getResolution(contractAddress, tokenId).call();
+                    if (resolution.walletAddress.toLowerCase() === accounts[0].toLowerCase()) {
+                        status.innerText = `Domain ${resolution.domainName} already resolved by this wallet`;
+                        dogMessage.innerText = "Woof! This domain is already yours, pup!";
+                        return;
+                    } else {
+                        status.innerText = `Domain ${resolution.domainName} is resolved by another address`;
+                        dogMessage.innerText = "Woof! Someone else claimed this domain, pup!";
+                        return;
+                    }
+                }
+                status.innerText = "Resolving domain...";
+                dogMessage.innerText = "Woof! Resolving your domain, hold tight, pup!";
+                const gas = await resolverContract.methods.resolveDomain(contractAddress, tokenId).estimateGas({ from: accounts[0] }).catch(() => 600000);
+                const tx = await resolverContract.methods.resolveDomain(contractAddress, tokenId).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
+                const resolution = await resolverContract.methods.getResolution(contractAddress, tokenId).call();
+                status.innerHTML = `Domain ${resolution.domainName} resolved to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)} (<a href="${shibarium.explorerUrl}/tx/${tx.transactionHash}" target="_blank">View Transaction</a>)`;
+                dogMessage.innerText = "Woof! Domain resolved successfully, pup!";
+                document.getElementById('tokenId').value = '';
+            } catch (error) {
+                status.innerText = "Failed to resolve domain: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
+                dogMessage.innerText = "Woof! Something went wrong, try again, pup!";
+            } finally {
+                section.classList.remove('loading');
+            }
+        }
+
+        async function resolveUrl() {
+            const section = document.getElementById('resolveUrlSection');
+            const status = document.getElementById('urlStatus');
+            const dogMessage = document.getElementById('dogMessage');
+            const tokenId = document.getElementById('tokenId').value.trim();
+            const url = document.getElementById('urlInput').value.trim();
+            if (!tokenId || isNaN(tokenId) || Number(tokenId) < 0) {
+                status.innerText = "Please enter a valid Token ID (positive integer)";
+                dogMessage.innerText = "Woof! Invalid Token ID, pup!";
+                return;
+            }
+            if (!url) {
+                status.innerText = "Please enter a valid URL";
+                dogMessage.innerText = "Woof! Need a URL to set, pup!";
+                return;
+            }
+            if (!accounts) {
+                status.innerText = "Please connect your wallet first!";
+                dogMessage.innerText = "Woof! Connect your wallet, pup!";
+                return;
+            }
+            try {
+                section.classList.add('loading');
+                status.innerText = "Checking ownership...";
+                dogMessage.innerText = "Woof! Checking your domain ownership, pup!";
+                const isOwned = await checkTokenOwnership(contractAddress, tokenId);
+                if (!isOwned) {
+                    status.innerText = "This address does not own the Token ID";
+                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    return;
+                }
+                status.innerText = "Setting URL...";
+                dogMessage.innerText = "Woof! Setting your URL, pup!";
+                const gas = await resolverContract.methods.resolveUrl(contractAddress, tokenId, url).estimateGas({ from: accounts[0] }).catch(() => 600000);
+                const tx = await resolverContract.methods.resolveUrl(contractAddress, tokenId, url).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
+                status.innerHTML = `URL set successfully (<a href="${shibarium.explorerUrl}/tx/${tx.transactionHash}" target="_blank">View Transaction</a>)`;
+                dogMessage.innerText = "Woof! URL set, good job, pup!";
+                document.getElementById('urlInput').value = '';
+            } catch (error) {
+                status.innerText = "Failed to set URL: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
+                dogMessage.innerText = "Woof! URL setting failed, try again, pup!";
+            } finally {
+                section.classList.remove('loading');
+            }
+        }
+
+        async function resolveText() {
+            const section = document.getElementById('resolveTextSection');
+            const status = document.getElementById('textStatus');
+            const dogMessage = document.getElementById('dogMessage');
+            const tokenId = document.getElementById('tokenId').value.trim();
+            const text = document.getElementById('textInput').value.trim();
+            if (!tokenId || isNaN(tokenId) || Number(tokenId) < 0) {
+                status.innerText = "Please enter a valid Token ID (positive integer)";
+                dogMessage.innerText = "Woof! Invalid Token ID, pup!";
+                return;
+            }
+            if (!text || text.length > 500) {
+                status.innerText = "Please enter valid text (1-500 characters)";
+                dogMessage.innerText = "Woof! Text is too long or empty, pup!";
+                return;
+            }
+            if (!accounts) {
+                status.innerText = "Please connect your wallet first!";
+                dogMessage.innerText = "Woof! Connect your wallet, pup!";
+                return;
+            }
+            try {
+                section.classList.add('loading');
+                status.innerText = "Checking ownership...";
+                dogMessage.innerText = "Woof! Checking your domain ownership, pup!";
+                const isOwned = await checkTokenOwnership(contractAddress, tokenId);
+                if (!isOwned) {
+                    status.innerText = "This address does not own the Token ID";
+                    dogMessage.innerText = "Woof! You don't own this domain, pup!";
+                    return;
+                }
+                status.innerText = "Setting text...";
+                dogMessage.innerText = "Woof! Setting your text, pup!";
+                const gas = await resolverContract.methods.resolveText(contractAddress, tokenId, text).estimateGas({ from: accounts[0] }).catch(() => 600000);
+                const tx = await resolverContract.methods.resolveText(contractAddress, tokenId, text).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
+                status.innerHTML = `Text set successfully (<a href="${shibarium.explorerUrl}/tx/${tx.transactionHash}" target="_blank">View Transaction</a>)`;
+                dogMessage.innerText = "Woof! Text set, great work, pup!";
+                document.getElementById('textInput').value = '';
+            } catch (error) {
+                status.innerText = "Failed to set text: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
+                dogMessage.innerText = "Woof! Text setting failed, try again, pup!";
+            } finally {
+                section.classList.remove('loading');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('connectButton').addEventListener('click', connectWallet);
+            document.getElementById('resolveDomain').addEventListener('click', resolveDomain);
+            document.getElementById('resolveUrl').addEventListener('click', resolveUrl);
+            document.getElementById('resolveText').addEventListener('click', resolveText);
+            document.getElementById('copyAddressButton').addEventListener('click', copyToClipboard);
+            if (!window.location.protocol.startsWith('http')) {
+                document.getElementById('networkStatus').innerHTML = 'Please run this page through a local server (e.g., "npx serve") to connect MetaMask.';
+                document.getElementById('dogMessage').innerText = "Woof! Run this on a server to connect, pup!";
+            } else if (!window.ethereum) {
+                document.getElementById('networkStatus').innerHTML = 'No wallet detected. Please install <a href="https://metamask.io">MetaMask</a>.';
+                document.getElementById('dogMessage').innerText = "Woof! MetaMask not found, pup!";
+            }
+        });
+    </script>
+</body>
+</html>
